@@ -2,7 +2,7 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             android:background="#0099cc"
+             android:background="#bebacc"
              tools:context=".MainActivity">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
@@ -12,52 +12,119 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:keepScreenOn="true"
-              android:textColor="#33b5e5"
+              android:textColor="#dde4e5"
               android:textStyle="bold"
               android:textSize="50sp"
               android:gravity="center"
-              android:text="@string/dummy_content"/>
+        />
 
     <!-- This FrameLayout insets its children based on system windows using
          android:fitsSystemWindows. -->
-    <FrameLayout android:layout_width="match_parent"
-                 android:layout_height="match_parent"
-                 android:fitsSystemWindows="true">
 
-        <LinearLayout android:id="@+id/fullscreen_content_controls"
-                      style="?metaButtonBarStyle"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:layout_gravity="bottom|center_horizontal"
-                      android:background="@color/black_overlay"
-                      android:orientation="horizontal"
-                      tools:ignore="UselessParent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:weightSum="1">
 
-            <Button android:id="@+id/dummy_button"
-                    style="?metaButtonBarButtonStyle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/dummy_button"/>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="top"
+            android:textAlignment="center"
+            android:layout_marginBottom="20dp">
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/app_name"
+                android:id="@+id/title"
+                android:textSize="100sp"
+                android:typeface="monospace"
+                android:paddingTop="25dp"
+                android:gravity="center"
+                android:textStyle="bold|italic"/>
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:baselineAligned="false"
+            android:paddingTop="0dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp">
+
+            <ImageButton
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:id="@+id/image1"
+                android:contextClickable="true"
+                android:contentDescription="Image1"
+                android:src="@drawable/avatar"
+                android:gravity="top"
+                android:layout_weight="1"
+                android:paddingLeft="20dp"
+                android:paddingRight="10dp"
+                android:paddingTop="0dp"
+                android:paddingBottom="0dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"/>
+
+            <ImageButton
+                android:layout_width="fill_parent"
+                android:layout_height="200dp"
+                android:id="@+id/image2"
+                android:contextClickable="true"
+                android:contentDescription="Image2"
+                android:src="@drawable/avatar"
+                android:layout_weight="1"
+                android:gravity="top"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="0dp"
+                android:paddingBottom="0dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="right|center_vertical">
+            android:layout_gravity="bottom">
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/imageView"/>
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/imageView2"/>
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/default_percent"
+                android:id="@+id/textView"
+                android:textSize="50sp"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="0dp"
+                android:layout_marginBottom="15dp"/>
         </LinearLayout>
-    </FrameLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:weightSum="0"
+            android:transitionGroup="false"
+            android:layout_weight="1.61"
+            >
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/submit_button"
+                android:id="@+id/button"
+                android:textSize="30sp"
+                />
+        </LinearLayout>
+
+    </LinearLayout>
 
 </FrameLayout>
