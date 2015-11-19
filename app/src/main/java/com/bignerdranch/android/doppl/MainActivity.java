@@ -4,6 +4,7 @@ import com.bignerdranch.android.doppl.util.SystemUiHider;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -42,13 +43,15 @@ import java.io.OutputStream;
  */
 public class MainActivity extends Activity {
 
-    Button image1;
-    Button image2;
+    public static final int REQUEST_CAMERA = 1;
+    public static final int SELECT_FILE = 2;
+    ImageButton image1;
+    ImageButton image2;
 
     public void addListenerOnButton() {
 
-        image1 = (Button) findViewById(R.id.image1);
-        image2 = (Button) findViewById(R.id.image2);
+        image1 = (ImageButton) findViewById(R.id.image1);
+        image2 = (ImageButton) findViewById(R.id.image2);
 
         image1.setOnClickListener(new View.OnClickListener() {
 
@@ -105,7 +108,7 @@ public class MainActivity extends Activity {
                 }
 
                 //if (image1.getD == "@drawable/avatar.png") {
-                image1.setBackground(thumbnail);
+              //    image1.setBackgroundResource(thumbnail);
                 //    image1.isClickable(false);
                 //} else {
                 //    image2.setImageBitmap(bm);
@@ -136,7 +139,7 @@ public class MainActivity extends Activity {
                 bm = BitmapFactory.decodeFile(selectedImagePath, options);
 
                 //if (image1.getD == "@drawable/avatar.png") {
-                    image1.setBackground(bm);
+                //    image1.setBackground(bm);
                 //    image1.isClickable(false);
                 //} else {
                 //    image2.setImageBitmap(bm);
@@ -147,6 +150,7 @@ public class MainActivity extends Activity {
     }
 
     private void selectImage(int parent_id) {
+
         final CharSequence[] items = { "Take Photo", "Choose from Library", "Cancel" };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -305,3 +309,4 @@ public class MainActivity extends Activity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 }
+**/
