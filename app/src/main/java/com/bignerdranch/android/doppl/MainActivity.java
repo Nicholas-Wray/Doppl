@@ -45,44 +45,63 @@ public class MainActivity extends Activity {
 
     public static final int REQUEST_CAMERA = 1;
     public static final int SELECT_FILE = 2;
+    public static final int IMAGE_ONE = 1;
+    public static final int IMAGE_TWO = 2;
     ImageButton image1;
     ImageButton image2;
 
-    public void addListenerOnButton() {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
         image1 = (ImageButton) findViewById(R.id.image1);
         image2 = (ImageButton) findViewById(R.id.image2);
 
         image1.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View arg0) {
-
-                //Logic here
-
+                selectImage();
             }
-
         });
 
         image2.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View arg0) {
 
-                //Logic here
-
+                selectImage();
             }
-
         });
-
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main);
+    public void selectImage() {
+
+        final CharSequence[] items = { "Take Photo", "Choose from Library", "Cancel" };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Add Photo!");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (items[item].equals("Take Photo")) {
+                    Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(cameraIntent, REQUEST_CAMERA);
+                } else if (items[item].equals("Choose from Library")) {
+                    Intent libraryIntent = new Intent(
+                            Intent.ACTION_PICK,
+                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    libraryIntent.setType("image/*");
+                    startActivityForResult(
+                            Intent.createChooser(libraryIntent, "Select File"), SELECT_FILE);
+                } else if (items[item].equals("Cancel")) {
+                    dialog.dismiss();
+                }
+            }
+        });
+        builder.show();
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -108,7 +127,8 @@ public class MainActivity extends Activity {
                 }
 
                 //if (image1.getD == "@drawable/avatar.png") {
-              //    image1.setBackgroundResource(thumbnail);
+                //
+                //    image1.setBackgroundResource(thumbnail);
                 //    image1.isClickable(false);
                 //} else {
                 //    image2.setImageBitmap(bm);
@@ -139,7 +159,7 @@ public class MainActivity extends Activity {
                 bm = BitmapFactory.decodeFile(selectedImagePath, options);
 
                 //if (image1.getD == "@drawable/avatar.png") {
-                //    image1.setBackground(bm);
+                //    image1.setBackgroundResource(bm);
                 //    image1.isClickable(false);
                 //} else {
                 //    image2.setImageBitmap(bm);
@@ -147,33 +167,6 @@ public class MainActivity extends Activity {
                 //}
             }
         }
-    }
-
-    private void selectImage(int parent_id) {
-
-        final CharSequence[] items = { "Take Photo", "Choose from Library", "Cancel" };
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        builder.setTitle("Add Photo!");
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-                if (items[item].equals("Take Photo")) {
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(intent, REQUEST_CAMERA);
-                } else if (items[item].equals("Choose from Library")) {
-                    Intent intent = new Intent(
-                            Intent.ACTION_PICK,
-                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    intent.setType("image/*");
-                    startActivityForResult(
-                            Intent.createChooser(intent, "Select File"), SELECT_FILE);
-                } else if (items[item].equals("Cancel")) {
-                    dialog.dismiss();
-                }
-            }
-        });
-        builder.show();
     }
 }
     /**
