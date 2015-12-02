@@ -100,7 +100,7 @@
                 android:layout_height="match_parent"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text="@string/default_percent"
-                android:id="@+id/textView"
+                android:id="@+id/similarity_percent"
                 android:textSize="50sp"
                 android:gravity="center_horizontal"
                 android:layout_marginTop="0dp"
@@ -120,7 +120,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="@string/submit_button"
-                android:id="@+id/button"
+                android:id="@+id/compare_button"
                 android:textSize="30sp"
                 />
         </LinearLayout>

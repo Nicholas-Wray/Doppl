@@ -47,8 +47,10 @@ public class MainActivity extends Activity {
     public static final int SELECT_FILE = 2;
     public static final int IMAGE_ONE = 1;
     public static final int IMAGE_TWO = 2;
+    public static final float threshold = 0.0f;
     ImageButton image1;
     ImageButton image2;
+    Button compare_button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +66,6 @@ public class MainActivity extends Activity {
                 selectImage();
             }
         });
-
         image2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
@@ -72,35 +73,14 @@ public class MainActivity extends Activity {
             }
         });
 
+        compare_button = (Button) findViewById(R.id.compare_button);
 
-        // listener
-        KairosListener listener = new KairosListener() {
-
+        compare_button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onSuccess(String response) {
-                Log.d("KAIROS DEMO", response);
+            public void onClick(View arg0) {
+                //similarity_percent.setText(int compareImage())
             }
-
-            @Override
-            public void onFail(String response) {
-                Log.d("KAIROS DEMO", response);
-            }
-        };
-
-
-        /* * * instantiate a new kairos instance * * */
-        Kairos myKairos = new Kairos();
-
-        /* * * set authentication * * */
-        String app_id = "10acb675";
-        String api_key = "3dd4660b913c705c2e99fb50ad1cf38b";
-        myKairos.setAuthentication(this, app_id, api_key);
-
-
-
-
-        try {
-
+        });
 
             /* * * * * * * * * * * * * * * * * * * * */
             /* * *  Kairos Method Call Examples * * */
@@ -114,7 +94,7 @@ public class MainActivity extends Activity {
 
 
             //  List galleries
-            myKairos.listGalleries(listener);
+            //myKairos.listGalleries(listener);
 
 
             /* * * * * * * * DETECT EXAMPLES * * * * * * *
@@ -217,14 +197,6 @@ public class MainActivity extends Activity {
             myKairos.deleteGallery("your_gallery_name", listener);
 
             */
-
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
     }
 
 
@@ -253,6 +225,50 @@ public class MainActivity extends Activity {
             }
         });
         builder.show();
+    }
+
+    public int compareImage(){
+        int percent = 0;
+        // listener
+        KairosListener listener = new KairosListener() {
+            @Override
+            public void onSuccess(String response) {
+                Log.d("KAIROS DEMO", response);
+            }
+
+            @Override
+            public void onFail(String response) {
+                Log.d("KAIROS DEMO", response);
+            }
+        };
+
+        /* * * instantiate a new kairos instance * * */
+        Kairos myKairos = new Kairos();
+
+        /* * * set authentication * * */
+        String app_id = "10acb675";
+        String api_key = "3dd4660b913c705c2e99fb50ad1cf38b";
+        myKairos.setAuthentication(this, app_id, api_key);
+
+        /* * * logic block * * */
+        //try {
+            //Enroll First Image
+            //Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.one);
+            //String subjectId = "subject";
+            //String galleryId = "1";
+            //myKairos.enroll(image, subjectId, galleryId, null, null, null, listener);
+
+            //Detect Second Image
+            //Bitmap image2 = BitmapFactory.decodeResource(getResources(), R.drawable.two);
+            //myKairos.recognize(image2, galleryId, null, null, null, threshold, listener);
+
+        //} catch (JSONException e) {
+        //    e.printStackTrace();
+        //} catch (UnsupportedEncodingException e) {
+        //    e.printStackTrace();
+        //}
+
+        return percent;
     }
 
     @Override
