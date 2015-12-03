@@ -31,6 +31,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import com.kairos.*;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.ByteArrayOutputStream;
@@ -85,6 +86,7 @@ public class MainActivity extends Activity {
                 compareImage();
             }
         });
+
 
             /* * * * * * * * * * * * * * * * * * * * */
             /* * *  Kairos Method Call Examples * * */
@@ -232,6 +234,7 @@ public class MainActivity extends Activity {
     }
 
     public void compareImage(){
+
         /* * * instantiate a new kairos instance * * */
         Kairos myKairos = new Kairos();
 
@@ -244,6 +247,7 @@ public class MainActivity extends Activity {
         KairosListener listener = new KairosListener() {
             @Override
             public void onSuccess(String response) {
+
                 Log.d("KAIROS DEMO", response);
             }
 
@@ -253,16 +257,23 @@ public class MainActivity extends Activity {
             }
         };
 
-        /* * * logic block * * */
+
+        //int percent = json.getJSONArray("images")[1].getJSONObject("transaction").getInt("confidence")
+
+        /* * * logic block * *
         try {
+            String image = "http://media.kairos.com/liz.jpg";
+            String subjectId = "Elizabeth";
+            String galleryId = "friends";
+            //myKairos.enroll(image, subjectId, galleryId, null, null, null, listener);
             //Enroll First Image
-            Bitmap bitmap1 = ((BitmapDrawable)image1.getDrawable()).getBitmap();
-            String subjectId = "subject";
-            String galleryId = "1";
-            myKairos.enroll(bitmap1, subjectId, galleryId, null, null, null, listener);
+            //Bitmap bitmap1 = ((BitmapDrawable)image1.getDrawable()).getBitmap();
+            //String subjectId = "subject";
+            //String galleryId = "1";
+            //myKairos.enroll(bitmap1, subjectId, galleryId, null, null, null, listener);
 
             //Detect Second Image
-            Bitmap bitmap2 = ((BitmapDrawable)image2.getDrawable()).getBitmap();
+            //Bitmap bitmap2 = ((BitmapDrawable)image2.getDrawable()).getBitmap();
             //myKairos.recognize(bitmap2, galleryId, null, null, null, threshold, listener);
 
         } catch (JSONException e) {
@@ -270,7 +281,7 @@ public class MainActivity extends Activity {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-
+        */
     }
 
     @Override
