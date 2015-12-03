@@ -48,6 +48,7 @@ public class MainActivity extends Activity {
     public static final int IMAGE_ONE = 1;
     public static final int IMAGE_TWO = 2;
     public static final float threshold = 0.0f;
+    public static int flag = 0;
     ImageButton image1;
     ImageButton image2;
     Button compare_button;
@@ -63,12 +64,14 @@ public class MainActivity extends Activity {
         image1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
+                flag = 1;
                 selectImage();
             }
         });
         image2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
+                flag = 2;
                 selectImage();
             }
         });
@@ -277,22 +280,11 @@ public class MainActivity extends Activity {
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_CAMERA) {
                 Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
-
-                File destination = new File(Environment.getExternalStorageDirectory(),
-                        System.currentTimeMillis() + ".jpg");
-
-                FileOutputStream fo;
-                try {
-                    destination.createNewFile();
-                    fo = new FileOutputStream(destination);
-                    fo.write(bytes.toByteArray());
-                    fo.close();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (flag == 1){
+                    image1.setImageBitmap(thumbnail);
+                }
+                else {
+                    image2.setImageBitmap(thumbnail);
                 }
 
                 //if (image1.getD == "@drawable/avatar.png") {
@@ -326,6 +318,12 @@ public class MainActivity extends Activity {
                 options.inSampleSize = scale;
                 options.inJustDecodeBounds = false;
                 bm = BitmapFactory.decodeFile(selectedImagePath, options);
+                if (flag == 1){
+                    image1.setImageBitmap(bm);
+                }
+                else {
+                    image2.setImageBitmap(bm);
+                }
 
                 //if (image1.getD == "@drawable/avatar.png") {
                 //    image1.setBackgroundResource(bm);
