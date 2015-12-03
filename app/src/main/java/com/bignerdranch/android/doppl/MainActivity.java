@@ -261,8 +261,13 @@ public class MainActivity extends Activity {
             @Override
             public void onSuccess(String response) {
                 Log.d("KAIROS DEMO", response);
-                //JSONObject jsonResponse = new JSONObject(response);
-                //int percent = jsonResponse.getJSONArray("images").getJSONObject("transaction").getInt("confidence");
+                try {
+                    JSONObject jsonResponse = new JSONObject(response);
+                    double percent = jsonResponse.getJSONArray("images").getJSONObject(0).getJSONObject("transaction").getDouble("confidence");
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
