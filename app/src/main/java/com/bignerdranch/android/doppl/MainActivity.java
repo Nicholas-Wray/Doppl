@@ -29,10 +29,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.kairos.*;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -49,11 +54,16 @@ public class MainActivity extends Activity {
     public static final int SELECT_FILE = 2;
     public static final int IMAGE_ONE = 1;
     public static final int IMAGE_TWO = 2;
-    public static final float threshold = 0.0f;
+    public static final String threshold = "0.0";
     public static int flag = 0;
     ImageButton image1;
     ImageButton image2;
     Button compare_button;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient mClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,8 +109,8 @@ public class MainActivity extends Activity {
             /* * * * * * * * * * * * * * * * */
 
 
-            //  List galleries
-            //myKairos.listGalleries(listener);
+        //  List galleries
+        //myKairos.listGalleries(listener);
 
 
             /* * * * * * * * DETECT EXAMPLES * * * * * * *
@@ -203,12 +213,15 @@ public class MainActivity extends Activity {
             myKairos.deleteGallery("your_gallery_name", listener);
 
             */
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        mClient = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
 
     public void selectImage() {
 
-        final CharSequence[] items = { "Take Photo", "Choose from Library", "Cancel" };
+        final CharSequence[] items = {"Take Photo", "Choose from Library", "Cancel"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Add Photo!");
@@ -221,7 +234,7 @@ public class MainActivity extends Activity {
                 } else if (items[item].equals("Choose from Library")) {
                     Intent libraryIntent = new Intent(
                             Intent.ACTION_PICK,
-                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     libraryIntent.setType("image/*");
                     startActivityForResult(
                             Intent.createChooser(libraryIntent, "Select File"), SELECT_FILE);
@@ -233,7 +246,7 @@ public class MainActivity extends Activity {
         builder.show();
     }
 
-    public void compareImage(){
+    public void compareImage() {
 
         /* * * instantiate a new kairos instance * * */
         Kairos myKairos = new Kairos();
@@ -247,8 +260,9 @@ public class MainActivity extends Activity {
         KairosListener listener = new KairosListener() {
             @Override
             public void onSuccess(String response) {
-
                 Log.d("KAIROS DEMO", response);
+                //JSONObject jsonResponse = new JSONObject(response);
+                //int percent = jsonResponse.getJSONArray("images").getJSONObject("transaction").getInt("confidence");
             }
 
             @Override
@@ -258,30 +272,26 @@ public class MainActivity extends Activity {
         };
 
 
-        //int percent = json.getJSONArray("images")[1].getJSONObject("transaction").getInt("confidence")
 
-        /* * * logic block * *
+        /* * * logic block * */
         try {
-            String image = "http://media.kairos.com/liz.jpg";
-            String subjectId = "Elizabeth";
-            String galleryId = "friends";
-            //myKairos.enroll(image, subjectId, galleryId, null, null, null, listener);
             //Enroll First Image
-            //Bitmap bitmap1 = ((BitmapDrawable)image1.getDrawable()).getBitmap();
-            //String subjectId = "subject";
-            //String galleryId = "1";
-            //myKairos.enroll(bitmap1, subjectId, galleryId, null, null, null, listener);
+            Bitmap bitmap1 = ((BitmapDrawable) image1.getDrawable()).getBitmap();
+            String subjectId = "subject";
+            String galleryId = "1";
+            myKairos.enroll(bitmap1, subjectId, galleryId, null, null, null, listener);
 
             //Detect Second Image
-            //Bitmap bitmap2 = ((BitmapDrawable)image2.getDrawable()).getBitmap();
-            //myKairos.recognize(bitmap2, galleryId, null, null, null, threshold, listener);
+            Bitmap bitmap2 = ((BitmapDrawable) image2.getDrawable()).getBitmap();
+            myKairos.recognize(bitmap2, galleryId, null, threshold, null, null, listener);
+            myKairos.deleteGallery(galleryId, listener);
 
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        */
+
     }
 
     @Override
@@ -290,11 +300,10 @@ public class MainActivity extends Activity {
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_CAMERA) {
                 Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-                if (flag == 1){
-                    image1.setImageBitmap(thumbnail);
-                }
-                else {
-                    image2.setImageBitmap(thumbnail);
+                if (flag == 1) {
+                    image1.setImageBitmap(Bitmap.createScaledBitmap(thumbnail, 350, 350, false));
+                } else {
+                    image2.setImageBitmap(Bitmap.createScaledBitmap(thumbnail, 350, 350, false));
                 }
 
             } else if (requestCode == SELECT_FILE) {
@@ -319,13 +328,52 @@ public class MainActivity extends Activity {
                 options.inSampleSize = scale;
                 options.inJustDecodeBounds = false;
                 bm = BitmapFactory.decodeFile(selectedImagePath, options);
-                if (flag == 1){
+                if (flag == 1) {
                     image1.setImageBitmap(bm);
-                }
-                else {
+                } else {
                     image2.setImageBitmap(bm);
                 }
             }
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        mClient.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://com.bignerdranch.android.doppl/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(mClient, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://com.bignerdranch.android.doppl/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(mClient, viewAction);
+        mClient.disconnect();
     }
 }
