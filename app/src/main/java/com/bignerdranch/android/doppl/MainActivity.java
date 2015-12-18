@@ -4,7 +4,9 @@ import com.bignerdranch.android.doppl.util.SystemUiHider;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.ExifInterface;
 import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,6 +30,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
@@ -59,6 +62,7 @@ public class MainActivity extends Activity {
     ImageButton image1;
     ImageButton image2;
     Button compare_button;
+    TextView similarity_percent;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -265,6 +269,7 @@ public class MainActivity extends Activity {
                     JSONObject jsonResponse = new JSONObject(response);
                     double percent = jsonResponse.getJSONArray("images").getJSONObject(0).getJSONObject("transaction").getDouble("confidence");
 
+                    similarity_percent.setText(Double.toString(percent));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -299,6 +304,50 @@ public class MainActivity extends Activity {
 
     }
 
+    public static Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
+
+        Matrix matrix = new Matrix();
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_NORMAL:
+                return bitmap;
+            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
+                matrix.setScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                matrix.setRotate(180);
+                break;
+            case ExifInterface.ORIENTATION_FLIP_VERTICAL:
+                matrix.setRotate(180);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_TRANSPOSE:
+                matrix.setRotate(90);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                matrix.setRotate(90);
+                break;
+            case ExifInterface.ORIENTATION_TRANSVERSE:
+                matrix.setRotate(-90);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                matrix.setRotate(-90);
+                break;
+            default:
+                return bitmap;
+        }
+        try {
+            Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            bitmap.recycle();
+            return bmRotated;
+        }
+        catch (OutOfMemoryError e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -321,6 +370,15 @@ public class MainActivity extends Activity {
 
                 String selectedImagePath = cursor.getString(column_index);
 
+                ExifInterface exif = null;
+                try {
+                    exif = new ExifInterface(selectedImagePath);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                        ExifInterface.ORIENTATION_UNDEFINED);
+
                 Bitmap bm;
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inJustDecodeBounds = true;
@@ -333,10 +391,12 @@ public class MainActivity extends Activity {
                 options.inSampleSize = scale;
                 options.inJustDecodeBounds = false;
                 bm = BitmapFactory.decodeFile(selectedImagePath, options);
+                Bitmap bmRotated = rotateBitmap(bm, orientation);
+
                 if (flag == 1) {
-                    image1.setImageBitmap(bm);
+                    image1.setImageBitmap(bmRotated);
                 } else {
-                    image2.setImageBitmap(bm);
+                    image2.setImageBitmap(bmRotated);
                 }
             }
         }
