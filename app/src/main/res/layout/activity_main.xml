@@ -110,21 +110,39 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="135dp"
             android:weightSum="0"
             android:transitionGroup="false"
             android:layout_weight="1.61"
-            >
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="30dp">
 
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="@string/submit_button"
                 android:id="@+id/compare_button"
-                android:textSize="30sp"
-                />
+                android:textSize="30sp"/>
+
         </LinearLayout>
 
-    </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:weightSum="0"
+            android:transitionGroup="false"
+            android:layout_weight="1.61"
+            >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/please_wait"
+                android:id="@+id/please_wait"
+                android:layout_gravity="center_horizontal|bottom"
+                android:gravity="center_horizontal"/>
 
+        </LinearLayout>
+    </LinearLayout>
 </FrameLayout>

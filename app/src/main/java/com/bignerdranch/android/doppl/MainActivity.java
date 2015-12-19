@@ -49,20 +49,30 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 
 public class MainActivity extends Activity {
 
+    public static final String IMAGES = "images";
+    public static final String TRANSACTION = "transaction";
+    public static final String CONFIDENCE = "confidence";
     public static final int REQUEST_CAMERA = 1;
     public static final int SELECT_FILE = 2;
     public static final int IMAGE_ONE = 1;
     public static final int IMAGE_TWO = 2;
     public static final String threshold = "0.0";
+    public static Double percent = 0.0;
     public static int flag = 0;
+    public static int successCounter = 0;
     ImageButton image1;
     ImageButton image2;
     Button compare_button;
     TextView similarity_percent;
+    TextView please_wait;
+
+    JSONArray images = null;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -93,7 +103,9 @@ public class MainActivity extends Activity {
         });
 
         compare_button = (Button) findViewById(R.id.compare_button);
-
+        similarity_percent = (TextView) findViewById(R.id.similarity_percent);
+        please_wait = (TextView) findViewById(R.id.please_wait);
+        please_wait.setVisibility(View.INVISIBLE);
         compare_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
@@ -252,6 +264,7 @@ public class MainActivity extends Activity {
 
     public void compareImage() {
 
+
         /* * * instantiate a new kairos instance * * */
         Kairos myKairos = new Kairos();
 
@@ -259,6 +272,7 @@ public class MainActivity extends Activity {
         String app_id = "10acb675";
         String api_key = "3dd4660b913c705c2e99fb50ad1cf38b";
         myKairos.setAuthentication(this, app_id, api_key);
+        please_wait.setVisibility(View.VISIBLE);
 
         // listener
         KairosListener listener = new KairosListener() {
@@ -267,9 +281,22 @@ public class MainActivity extends Activity {
                 Log.d("KAIROS DEMO", response);
                 try {
                     JSONObject jsonResponse = new JSONObject(response);
-                    double percent = jsonResponse.getJSONArray("images").getJSONObject(0).getJSONObject("transaction").getDouble("confidence");
+                    Log.d("Response: ", response);
+                    successCounter++;
 
-                    similarity_percent.setText(Double.toString(percent));
+                    if (successCounter == 3){
+                        images = jsonResponse.getJSONArray(IMAGES);
+                        JSONObject image = images.getJSONObject(0);
+                        JSONObject subimage = image.getJSONObject(TRANSACTION);
+                        percent = subimage.getDouble(CONFIDENCE);
+                        Log.d("Percent: ", percent.toString());
+                        percent = percent * 100;
+                        percent = round(percent, 2);
+                        similarity_percent.setText(Double.toString(percent) + "%");
+                        successCounter = 0;
+                        please_wait.setVisibility(View.INVISIBLE);
+                    }
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -286,22 +313,35 @@ public class MainActivity extends Activity {
         /* * * logic block * */
         try {
             //Enroll First Image
+
             Bitmap bitmap1 = ((BitmapDrawable) image1.getDrawable()).getBitmap();
             String subjectId = "subject";
             String galleryId = "1";
+//            if (compareFlag == 1){
+//                myKairos.deleteGallery(galleryId, listener);
+//            }
             myKairos.enroll(bitmap1, subjectId, galleryId, null, null, null, listener);
 
             //Detect Second Image
             Bitmap bitmap2 = ((BitmapDrawable) image2.getDrawable()).getBitmap();
             myKairos.recognize(bitmap2, galleryId, null, threshold, null, null, listener);
+
             myKairos.deleteGallery(galleryId, listener);
+            //compareFlag = 1;
 
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+    }
 
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 
     public static Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
