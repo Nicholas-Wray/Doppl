@@ -57,6 +57,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.SocketTimeoutException;
+import java.util.concurrent.Executor;
 
 
 public class MainActivity extends Activity {
@@ -124,7 +125,8 @@ public class MainActivity extends Activity {
         compare_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                compareImage();
+                    compareImage();
+                    //please_wait.setText("Socket Timeout: Please Try Again");
 //                try {
 //                    JSONObject image2 = images1.getJSONObject(1);
 //                    JSONObject subimage2 = image2.getJSONObject(GENDER);
@@ -212,11 +214,10 @@ public class MainActivity extends Activity {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    public void compareImage() {
-
+    public void compareImage(){
         boolean network = isNetworkAvailable();
 
-        if (network == false){
+        if (network == false) {
             //get the LayoutInflater and inflate the custom_toast layout
             LayoutInflater inflater = getLayoutInflater();
             View layout = inflater.inflate(R.layout.custom_toast, (ViewGroup)
@@ -250,9 +251,7 @@ public class MainActivity extends Activity {
                 Log.d("KAIROS DEMO", response);
                 try {
                     JSONObject jsonResponse = new JSONObject(response);
-                         if (successCounter == 1){
-                             images1 = jsonResponse.getJSONArray(IMAGES);
-                    } else if (successCounter == 2){
+                    if (successCounter == 2) {
                         if (IMAGES != null) {
                             JSONArray images2 = jsonResponse.getJSONArray(IMAGES);
                             JSONObject image = images2.getJSONObject(0);
@@ -289,12 +288,12 @@ public class MainActivity extends Activity {
         /* * * logic block * */
         try {
             //Enroll First Image
-
             Bitmap bitmap1 = ((BitmapDrawable) image1.getDrawable()).getBitmap();
             String subjectId = "subject";
             String galleryId = "1";
-//            if (compareFlag == 1){
-//                myKairos.deleteGallery(galleryId, listener);
+//            if (one == 1){
+//                please_wait.setText("Socket Timeout: Please Try Again");
+//                return;
 //            }
             myKairos.enroll(bitmap1, subjectId, galleryId, null, null, null, listener);
 
@@ -302,8 +301,9 @@ public class MainActivity extends Activity {
             Bitmap bitmap2 = ((BitmapDrawable) image2.getDrawable()).getBitmap();
             myKairos.recognize(bitmap2, galleryId, null, threshold, null, null, listener);
 
+            //Delete Gallery
             myKairos.deleteGallery(galleryId, listener);
-            //compareFlag = 1;
+
 
         } catch (JSONException e) {
             e.printStackTrace();
