@@ -4,13 +4,17 @@ import com.bignerdranch.android.doppl.util.SystemUiHider;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.ExifInterface;
 import android.media.Image;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.app.AlertDialog;
@@ -24,6 +28,7 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.util.Log;
 import android.view.Menu;
@@ -51,6 +56,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.SocketTimeoutException;
 
 
 public class MainActivity extends Activity {
@@ -58,21 +64,26 @@ public class MainActivity extends Activity {
     public static final String IMAGES = "images";
     public static final String TRANSACTION = "transaction";
     public static final String CONFIDENCE = "confidence";
+    public static final String ATTRIBUTES = "attributes";
+    public static final String GENDER = "gender";
+    public static final String TYPE = "type";
     public static final int REQUEST_CAMERA = 1;
     public static final int SELECT_FILE = 2;
-    public static final int IMAGE_ONE = 1;
-    public static final int IMAGE_TWO = 2;
     public static final String threshold = "0.0";
     public static Double percent = 0.0;
     public static int flag = 0;
     public static int successCounter = 0;
+    public static boolean openFlag = false;
     ImageButton image1;
     ImageButton image2;
     Button compare_button;
     TextView similarity_percent;
     TextView please_wait;
+    TextView img1data;
+    TextView img2data;
+    final Context context = this;
+    public JSONArray images1, images2;
 
-    JSONArray images = null;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -104,134 +115,66 @@ public class MainActivity extends Activity {
 
         compare_button = (Button) findViewById(R.id.compare_button);
         similarity_percent = (TextView) findViewById(R.id.similarity_percent);
+        img1data = (TextView) findViewById(R.id.img1data);
+        img2data = (TextView) findViewById(R.id.img2data);
         please_wait = (TextView) findViewById(R.id.please_wait);
         please_wait.setVisibility(View.INVISIBLE);
+        img1data.setVisibility(View.INVISIBLE);
+        img2data.setVisibility(View.INVISIBLE);
         compare_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
                 compareImage();
+//                try {
+//                    JSONObject image2 = images1.getJSONObject(1);
+//                    JSONObject subimage2 = image2.getJSONObject(GENDER);
+//                    String gender2 = subimage2.getString(TYPE);
+//                    String gPercent2 = subimage2.getString(CONFIDENCE);
+//                    if (gender2 == "M"){
+//                        gender2 = "Male ";
+//                    } else {
+//                        gender2 = "Female ";
+//                    }
+//                    img2data.setText(gender2 + gPercent2);
+//
+
+//
+//                } catch (JSONException e){
+//                    e.printStackTrace();
+//                }
             }
         });
 
-
-            /* * * * * * * * * * * * * * * * * * * * */
-            /* * *  Kairos Method Call Examples * * */
-            /* * * * * * * * * * * * * * * * * * * */
-            /* * * * * * * * * * * * * * * * * * **/
-            /* * * * * * * * * * * * * * * * * * */
-            /* * * * * * * * * * * * * * * * * **/
-            /* * * * * * * * * * * * * * * * * */
-            /* * * * * * * * * * * * * * * * **/
-            /* * * * * * * * * * * * * * * * */
-
-
-        //  List galleries
-        //myKairos.listGalleries(listener);
-
-
-            /* * * * * * * * DETECT EXAMPLES * * * * * * *
-
-
-            // Bare-essentials Example:
-            // This example uses only an image url, setting optional params to null
-            String image = "http://media.kairos.com/liz.jpg";
-            myKairos.detect(image, null, null, listener);
-
-
-
-            // Fine-grained Example:
-            // This example uses a bitmap image and also optional parameters
-            Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.liz);
-            String selector = "FULL";
-            String minHeadScale = "0.25";
-            myKairos.detect(image, selector, minHeadScale, listener);
-
-            */
-
-
-
-            /* * * * * * * * ENROLL EXAMPLES * * * * * * *
-
-            // Bare-essentials Example:
-            // This example uses only an image url, setting optional params to null
-            String image = "http://media.kairos.com/liz.jpg";
-            String subjectId = "Elizabeth";
-            String galleryId = "friends";
-            myKairos.enroll(image, subjectId, galleryId, null, null, null, listener);
-
-
-            // Fine-grained Example:
-            // This example uses a bitmap image and also optional parameters
-            Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.liz);
-            String subjectId = "Elizabeth";
-            String galleryId = "friends";
-            String selector = "FULL";
-            String multipleFaces = "false";
-            String minHeadScale = "0.25";
-            myKairos.enroll(image,
-                    subjectId,
-                    galleryId,
-                    selector,
-                    multipleFaces,
-                    minHeadScale,
-                    listener);
-
-                    */
-
-
-            /* * * * * * * RECOGNIZE EXAMPLES * * * * * * *
-
-            // Bare-essentials Example:
-            // This example uses only an image url, setting optional params to null
-            String image = "http://media.kairos.com/liz.jpg";
-            String galleryId = "friends";
-            myKairos.recognize(image, galleryId, null, null, null, null, listener);
-
-
-            // Fine-grained Example:
-            // This example uses a bitmap image and also optional parameters
-            Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.liz);
-            String galleryId = "friends";
-            String selector = "FULL";
-            String threshold = "0.75";
-            String minHeadScale = "0.25";
-            String maxNumResults = "25";
-            myKairos.recognize(image,
-                    galleryId,
-                    selector,
-                    threshold,
-                    minHeadScale,
-                    maxNumResults,
-                    listener);
-
-                    */
-
-
-            /* * * * GALLERY-MANAGEMENT EXAMPLES * * * *
-
-
-            //  List galleries
-            myKairos.listGalleries(listener);
-
-
-
-            //  List subjects in gallery
-            myKairos.listSubjectsForGallery("your_gallery_name", listener);
-
-
-
-            // Delete subject from gallery
-            myKairos.deleteSubject("your_subject_id", "your_gallery_name", listener);
-
-
-
-            // Delete an entire gallery
-            myKairos.deleteGallery("your_gallery_name", listener);
-
-            */
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         mClient = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+
+        if (openFlag == false) {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+
+            // set title
+            alertDialogBuilder.setTitle("Welcome to Doppl!");
+
+            // set dialog message
+            alertDialogBuilder
+                    .setMessage("Compare your friends selfies! Uses the Kairos API! Please note photos can take up to 15 seconds to process.")
+                    .setCancelable(false)
+                    .setPositiveButton("Get to it!", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // if this button is clicked, close
+                            // current activity
+                            dialog.cancel();
+                        }
+                    });
+
+            // create alert dialog
+            AlertDialog alertDialog = alertDialogBuilder.create();
+
+            // show it
+            alertDialog.show();
+            openFlag = true;
+        }
+
     }
 
 
@@ -262,15 +205,41 @@ public class MainActivity extends Activity {
         builder.show();
     }
 
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
     public void compareImage() {
 
+        boolean network = isNetworkAvailable();
 
+        if (network == false){
+            //get the LayoutInflater and inflate the custom_toast layout
+            LayoutInflater inflater = getLayoutInflater();
+            View layout = inflater.inflate(R.layout.custom_toast, (ViewGroup)
+                    findViewById(R.id.toast_layout_root));
+
+            //get the TextView from the custom_toast layout
+            TextView text = (TextView) layout.findViewById(R.id.toastText);
+            text.setText("This action requires internet connectivity");
+
+            //create the toast object, set display duration,
+            //set the view as layout that's inflated above and then call show()
+            Toast t = new Toast(getApplicationContext());
+            t.setDuration(Toast.LENGTH_LONG);
+            t.setView(layout);
+            t.show();
+            return;
+        }
         /* * * instantiate a new kairos instance * * */
         Kairos myKairos = new Kairos();
 
         /* * * set authentication * * */
-        String app_id = "10acb675";
-        String api_key = "3dd4660b913c705c2e99fb50ad1cf38b";
+        String app_id = "45001bf1";
+        String api_key = "ae1e5431443f875a90085d5b27a36b17";
         myKairos.setAuthentication(this, app_id, api_key);
         please_wait.setVisibility(View.VISIBLE);
 
@@ -281,21 +250,28 @@ public class MainActivity extends Activity {
                 Log.d("KAIROS DEMO", response);
                 try {
                     JSONObject jsonResponse = new JSONObject(response);
-                    Log.d("Response: ", response);
-                    successCounter++;
-
-                    if (successCounter == 3){
-                        images = jsonResponse.getJSONArray(IMAGES);
-                        JSONObject image = images.getJSONObject(0);
-                        JSONObject subimage = image.getJSONObject(TRANSACTION);
-                        percent = subimage.getDouble(CONFIDENCE);
-                        Log.d("Percent: ", percent.toString());
-                        percent = percent * 100;
-                        percent = round(percent, 2);
-                        similarity_percent.setText(Double.toString(percent) + "%");
-                        successCounter = 0;
-                        please_wait.setVisibility(View.INVISIBLE);
+                         if (successCounter == 1){
+                             images1 = jsonResponse.getJSONArray(IMAGES);
+                    } else if (successCounter == 2){
+                        if (IMAGES != null) {
+                            JSONArray images2 = jsonResponse.getJSONArray(IMAGES);
+                            JSONObject image = images2.getJSONObject(0);
+                            JSONObject subimage = image.getJSONObject(TRANSACTION);
+                            percent = subimage.getDouble(CONFIDENCE);
+                            Log.d("Percent: ", percent.toString());
+                            percent = percent * 100;
+                            percent = round(percent, 2);
+                            similarity_percent.setText(Double.toString(percent) + "%");
+                            successCounter = 0;
+                            please_wait.setVisibility(View.INVISIBLE);
+                            img1data.setVisibility(View.VISIBLE);
+                            img2data.setVisibility(View.VISIBLE);
+                        } else {
+                            please_wait.setText("No match found. Please retake photos");
+                        }
                     }
+                    successCounter++;
+                    Log.d("Response_number: ", Integer.toString(successCounter));
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -434,9 +410,9 @@ public class MainActivity extends Activity {
                 Bitmap bmRotated = rotateBitmap(bm, orientation);
 
                 if (flag == 1) {
-                    image1.setImageBitmap(bmRotated);
+                    image1.setImageBitmap(Bitmap.createScaledBitmap(bmRotated, 350, 350, false));
                 } else {
-                    image2.setImageBitmap(bmRotated);
+                    image2.setImageBitmap(Bitmap.createScaledBitmap(bmRotated, 350, 350, false));
                 }
             }
         }
@@ -460,6 +436,7 @@ public class MainActivity extends Activity {
                 Uri.parse("android-app://com.bignerdranch.android.doppl/http/host/path")
         );
         AppIndex.AppIndexApi.start(mClient, viewAction);
+
     }
 
     @Override
