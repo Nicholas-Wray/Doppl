@@ -2,9 +2,11 @@ package com.bignerdranch.android.doppl;
 
 import com.bignerdranch.android.doppl.util.SystemUiHider;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.ExifInterface;
@@ -62,14 +64,22 @@ import java.util.concurrent.Executor;
 
 public class MainActivity extends Activity {
 
+    // Kairos JSON responee parse constants
     public static final String IMAGES = "images";
     public static final String TRANSACTION = "transaction";
     public static final String CONFIDENCE = "confidence";
     public static final String ATTRIBUTES = "attributes";
     public static final String GENDER = "gender";
     public static final String TYPE = "type";
+
+    // Potential intents request codes
     public static final int REQUEST_CAMERA = 1;
     public static final int SELECT_FILE = 2;
+
+    //Permission codes constants
+    final private int REQUEST_CODE_CAMERA = 123;
+    final private int REQUEST_CODE_READ_STORAGE = 321;
+
     public static final String threshold = "0.0";
     public static Double percent = 0.0;
     public static int flag = 0;
@@ -190,21 +200,49 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(DialogInterface dialog, int item) {
                 if (items[item].equals("Take Photo")) {
-                    Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(cameraIntent, REQUEST_CAMERA);
+                    startCameraActivityDummy();
                 } else if (items[item].equals("Choose from Library")) {
-                    Intent libraryIntent = new Intent(
-                            Intent.ACTION_PICK,
-                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    libraryIntent.setType("image/*");
-                    startActivityForResult(
-                            Intent.createChooser(libraryIntent, "Select File"), SELECT_FILE);
+                    startPhotoLibraryActivityDummy();
                 } else if (items[item].equals("Cancel")) {
                     dialog.dismiss();
                 }
             }
         });
         builder.show();
+    }
+
+    private void startCameraActivityDummy() {
+        int hasCameraPermission = checkSelfPermission(Manifest.permission.CAMERA);
+        if (hasCameraPermission != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[] {Manifest.permission.CAMERA},
+                    REQUEST_CODE_CAMERA);
+            return;
+        }
+        startCameraActivity();
+    }
+
+    private void startPhotoLibraryActivityDummy() {
+        int hasReadStoragePermission = checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (hasReadStoragePermission != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE},
+                    REQUEST_CODE_READ_STORAGE);
+            return;
+        }
+        startPhotoLibraryActivity();
+    }
+
+    public void startCameraActivity() {
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(cameraIntent, REQUEST_CAMERA);
+    }
+
+    public void startPhotoLibraryActivity() {
+        Intent libraryIntent = new Intent(
+                Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        libraryIntent.setType("image/*");
+        startActivityForResult(
+                Intent.createChooser(libraryIntent, "Select File"), SELECT_FILE);
     }
 
     private boolean isNetworkAvailable() {
