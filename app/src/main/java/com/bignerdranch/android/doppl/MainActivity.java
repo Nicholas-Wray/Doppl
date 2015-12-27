@@ -216,6 +216,8 @@ public class MainActivity extends Activity {
         if (hasCameraPermission != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[] {Manifest.permission.CAMERA},
                     REQUEST_CODE_CAMERA);
+            requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE},
+                    REQUEST_CODE_READ_STORAGE);
             return;
         }
         startCameraActivity();
