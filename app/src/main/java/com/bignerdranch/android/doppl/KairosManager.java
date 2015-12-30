@@ -23,6 +23,9 @@ import java.util.List;
  */
 public class KairosManager extends AsyncTask<Bitmap, Void, JSONObject> {
 
+    // Kairos declaration
+    public static Kairos myKairos;
+
     // Kairos JSON response parse constants
     public static final String IMAGES = "images";
     public static final String TRANSACTION = "transaction";
@@ -34,16 +37,19 @@ public class KairosManager extends AsyncTask<Bitmap, Void, JSONObject> {
     public static int successCounter = 0;
     public static JSONObject jsonResponse;
 
+
     // MainActivity Context
     private Activity mActivity;
 
-    //
+    // Setup connection with Main UI
     TextView similarity_percent;
 
 
     public KairosManager(Activity activity){
-        mActivity = activity;
-        similarity_percent = (TextView) activity.findViewById(R.id.similarity_percent);
+        this.mActivity = activity;
+        similarity_percent = (TextView) mActivity.findViewById(R.id.similarity_percent);
+        //Setup connection with Kairos
+        myKairos = new Kairos();
     }
 
     // Take both images in the array and call compareImages which calls the service.
@@ -51,12 +57,11 @@ public class KairosManager extends AsyncTask<Bitmap, Void, JSONObject> {
     protected JSONObject doInBackground(Bitmap... params){
         Bitmap bm1 = params[0];
         Bitmap bm2 = params[1];
-        Kairos myKairos = new Kairos();
 
-        /* * * set authentication * * */
+        // Set Kairos authentication
         String app_id = "45001bf1";
         String api_key = "ae1e5431443f875a90085d5b27a36b17";
-        myKairos.setAuthentication(mActivity, app_id, api_key);
+        myKairos.setAuthentication(this.mActivity, app_id, api_key);
 
         // listener
         KairosListener listener = new KairosListener() {

@@ -43,7 +43,6 @@ import android.widget.Toast;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.kairos.*;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -179,6 +178,7 @@ public class MainActivity extends Activity {
 
             // show it
             alertDialog.show();
+
             openFlag = true;
         }
 
@@ -369,7 +369,7 @@ public class MainActivity extends Activity {
             return;
         }
 
-
+        Log.d("This = ", this.toString());
         KairosManager myKairosManager = new KairosManager(this);
         myKairosManager.execute(((BitmapDrawable) image1.getDrawable()).getBitmap(), ((BitmapDrawable) image2.getDrawable()).getBitmap());
         please_wait.setVisibility(View.VISIBLE);
