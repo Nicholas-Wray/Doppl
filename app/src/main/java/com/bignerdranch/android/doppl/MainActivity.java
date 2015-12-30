@@ -373,7 +373,7 @@ public class MainActivity extends Activity {
         photos.add(((BitmapDrawable) image1.getDrawable()).getBitmap());
         photos.add(((BitmapDrawable) image2.getDrawable()).getBitmap());
 
-        KairosManager myKairosManager = new KairosManager();
+        KairosManager myKairosManager = new KairosManager(this);
         myKairosManager.execute(photos);
         please_wait.setVisibility(View.VISIBLE);
     }

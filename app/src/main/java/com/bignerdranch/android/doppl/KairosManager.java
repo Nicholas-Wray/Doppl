@@ -1,5 +1,6 @@
 package com.bignerdranch.android.doppl;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -28,12 +29,18 @@ public class KairosManager extends AsyncTask<ArrayList<Bitmap>, Void, Void> {
     public static final String TYPE = "type";
 
     // Other Kairos call variables...
-    public static Double confidence = 0.0;
-    public static Double threshold = 0.0;
+    public static String threshold = "0.0";
+
+    // MainActivity Context
+    private Context mContext;
+
+    public KairosManager(Context context){
+        mContext = context;
+    }
 
 
     @Override
-    protected String doInBackground(ArrayList<Bitmap> params){
+    protected Double doInBackground(ArrayList<Bitmap> params){
 
         Bitmap bm1 = params.get(0);
         Bitmap bm2 = params.get(1);
@@ -47,8 +54,10 @@ public class KairosManager extends AsyncTask<ArrayList<Bitmap>, Void, Void> {
 
     }
 
-    public String compareImages(Bitmap bm1, Bitmap bm2){
+    public Double compareImages(Bitmap bm1, Bitmap bm2){
         // Kairos Call here!
+
+        Double confidence = 0.0;
 
         /* * * instantiate a new kairos instance * * */
         Kairos myKairos = new Kairos();
@@ -56,7 +65,7 @@ public class KairosManager extends AsyncTask<ArrayList<Bitmap>, Void, Void> {
         /* * * set authentication * * */
         String app_id = "45001bf1";
         String api_key = "ae1e5431443f875a90085d5b27a36b17";
-        myKairos.setAuthentication(this, app_id, api_key);
+        myKairos.setAuthentication(mContext, app_id, api_key);
 
         // listener
         KairosListener listener = new KairosListener() {
@@ -98,10 +107,7 @@ public class KairosManager extends AsyncTask<ArrayList<Bitmap>, Void, Void> {
             //Enroll First Image
             String subjectId = "subject";
             String galleryId = "1";
-//            if (one == 1){
-//                please_wait.setText("Socket Timeout: Please Try Again");
-//                return;
-//            }
+
             myKairos.enroll(bm1, subjectId, galleryId, null, null, null, listener);
 
             //Detect Second Image
@@ -116,6 +122,8 @@ public class KairosManager extends AsyncTask<ArrayList<Bitmap>, Void, Void> {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+
+        return confidence;
     }
 }
 
