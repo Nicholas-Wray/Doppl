@@ -59,18 +59,13 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Executor;
 
 
 public class MainActivity extends Activity {
-
-    // Kairos JSON responee parse constants
-    public static final String IMAGES = "images";
-    public static final String TRANSACTION = "transaction";
-    public static final String CONFIDENCE = "confidence";
-    public static final String ATTRIBUTES = "attributes";
-    public static final String GENDER = "gender";
-    public static final String TYPE = "type";
 
     // Potential intents request codes
     public static final int REQUEST_CAMERA = 1;
@@ -373,81 +368,14 @@ public class MainActivity extends Activity {
             t.show();
             return;
         }
-        /* * * instantiate a new kairos instance * * */
-        Kairos myKairos = new Kairos();
 
-        /* * * set authentication * * */
-        String app_id = "45001bf1";
-        String api_key = "ae1e5431443f875a90085d5b27a36b17";
-        myKairos.setAuthentication(this, app_id, api_key);
+        ArrayList<Bitmap> photos = new ArrayList<Bitmap>();
+        photos.add(((BitmapDrawable) image1.getDrawable()).getBitmap());
+        photos.add(((BitmapDrawable) image2.getDrawable()).getBitmap());
+
+        KairosManager myKairosManager = new KairosManager();
+        myKairosManager.execute(photos);
         please_wait.setVisibility(View.VISIBLE);
-
-        // listener
-        KairosListener listener = new KairosListener() {
-            @Override
-            public void onSuccess(String response) {
-                Log.d("KAIROS DEMO", response);
-                try {
-                    JSONObject jsonResponse = new JSONObject(response);
-                    if (successCounter == 2) {
-                        if (IMAGES != null) {
-                            JSONArray images2 = jsonResponse.getJSONArray(IMAGES);
-                            JSONObject image = images2.getJSONObject(0);
-                            JSONObject subimage = image.getJSONObject(TRANSACTION);
-                            percent = subimage.getDouble(CONFIDENCE);
-                            Log.d("Percent: ", percent.toString());
-                            percent = percent * 100;
-                            percent = round(percent, 2);
-                            similarity_percent.setText(Double.toString(percent) + "%");
-                            successCounter = 0;
-                            please_wait.setVisibility(View.INVISIBLE);
-                            img1data.setVisibility(View.VISIBLE);
-                            img2data.setVisibility(View.VISIBLE);
-                        } else {
-                            please_wait.setText("No match found. Please retake photos");
-                        }
-                    }
-                    successCounter++;
-                    Log.d("Response_number: ", Integer.toString(successCounter));
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFail(String response) {
-                Log.d("KAIROS DEMO", response);
-            }
-        };
-
-
-
-        /* * * logic block * */
-        try {
-            //Enroll First Image
-            Bitmap bitmap1 = ((BitmapDrawable) image1.getDrawable()).getBitmap();
-            String subjectId = "subject";
-            String galleryId = "1";
-//            if (one == 1){
-//                please_wait.setText("Socket Timeout: Please Try Again");
-//                return;
-//            }
-            myKairos.enroll(bitmap1, subjectId, galleryId, null, null, null, listener);
-
-            //Detect Second Image
-            Bitmap bitmap2 = ((BitmapDrawable) image2.getDrawable()).getBitmap();
-            myKairos.recognize(bitmap2, galleryId, null, threshold, null, null, listener);
-
-            //Delete Gallery
-            myKairos.deleteGallery(galleryId, listener);
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
     }
 
     public static double round(double value, int places) {
