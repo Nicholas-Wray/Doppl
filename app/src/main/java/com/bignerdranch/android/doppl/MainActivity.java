@@ -200,9 +200,9 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(DialogInterface dialog, int item) {
                 if (items[item].equals("Take Photo")) {
-                    startCameraActivityDummy();
+                    startCameraActivity();
                 } else if (items[item].equals("Choose from Library")) {
-                    startPhotoLibraryActivityDummy();
+                    startPhotoLibraryActivity();
                 } else if (items[item].equals("Cancel")) {
                     dialog.dismiss();
                 }
@@ -211,27 +211,30 @@ public class MainActivity extends Activity {
         builder.show();
     }
 
-    private void startCameraActivityDummy() {
-        int hasCameraPermission = checkSelfPermission(Manifest.permission.CAMERA);
-        if (hasCameraPermission != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[] {Manifest.permission.CAMERA},
-                    REQUEST_CODE_CAMERA);
-            requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE},
-                    REQUEST_CODE_READ_STORAGE);
-            return;
-        }
-        startCameraActivity();
-    }
 
-    private void startPhotoLibraryActivityDummy() {
-        int hasReadStoragePermission = checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
-        if (hasReadStoragePermission != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE},
-                    REQUEST_CODE_READ_STORAGE);
-            return;
-        }
-        startPhotoLibraryActivity();
-    }
+    // NICK, LEAVE THIS HERE!
+
+//    private void startCameraActivityDummy() {
+//        int hasCameraPermission = checkSelfPermission(Manifest.permission.CAMERA);
+//        if (hasCameraPermission != PackageManager.PERMISSION_GRANTED) {
+//            requestPermissions(new String[] {Manifest.permission.CAMERA},
+//                    REQUEST_CODE_CAMERA);
+//            requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE},
+//                    REQUEST_CODE_READ_STORAGE);
+//            return;
+//        }
+//        startCameraActivity();
+//    }
+//
+//    private void startPhotoLibraryActivityDummy() {
+//        int hasReadStoragePermission = checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
+//        if (hasReadStoragePermission != PackageManager.PERMISSION_GRANTED) {
+//            requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE},
+//                    REQUEST_CODE_READ_STORAGE);
+//            return;
+//        }
+//        startPhotoLibraryActivity();
+//    }
 
     public void startCameraActivity() {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
