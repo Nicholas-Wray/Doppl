@@ -1,15 +1,18 @@
 package com.bignerdranch.android.doppl;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.kairos.*;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import android.widget.TextView;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -18,72 +21,53 @@ import java.util.List;
 /**
  * Created by Jacobo on 12/30/15.
  */
-public class KairosManager extends AsyncTask<ArrayList<Bitmap>, Void, Void> {
+public class KairosManager extends AsyncTask<Bitmap, Void, JSONObject> {
 
-    // Kairos JSON responee parse constants
+    // Kairos JSON response parse constants
     public static final String IMAGES = "images";
     public static final String TRANSACTION = "transaction";
     public static final String CONFIDENCE = "confidence";
-    public static final String ATTRIBUTES = "attributes";
-    public static final String GENDER = "gender";
-    public static final String TYPE = "type";
 
     // Other Kairos call variables...
-    public static String threshold = "0.0";
+    public final String threshold = "0.0";
+    public static Double confidence = 0.0;
+    public static int successCounter = 0;
+    public static JSONObject jsonResponse;
 
     // MainActivity Context
-    private Context mContext;
+    private Activity mActivity;
 
-    public KairosManager(Context context){
-        mContext = context;
+    //
+    TextView similarity_percent;
+
+
+    public KairosManager(Activity activity){
+        mActivity = activity;
+        similarity_percent = (TextView) activity.findViewById(R.id.similarity_percent);
     }
 
-
+    // Take both images in the array and call compareImages which calls the service.
     @Override
-    protected Double doInBackground(ArrayList<Bitmap> params){
-
-        Bitmap bm1 = params.get(0);
-        Bitmap bm2 = params.get(1);
-
-        return compareImages(bm1, bm2);
-    }
-
-    @Override
-    protected Double onPostExecute(String result){
-        // Return confidence or error to MainACtivity
-
-    }
-
-    public Double compareImages(Bitmap bm1, Bitmap bm2){
-        // Kairos Call here!
-
-        Double confidence = 0.0;
-
-        /* * * instantiate a new kairos instance * * */
+    protected JSONObject doInBackground(Bitmap... params){
+        Bitmap bm1 = params[0];
+        Bitmap bm2 = params[1];
         Kairos myKairos = new Kairos();
 
         /* * * set authentication * * */
         String app_id = "45001bf1";
         String api_key = "ae1e5431443f875a90085d5b27a36b17";
-        myKairos.setAuthentication(mContext, app_id, api_key);
+        myKairos.setAuthentication(mActivity, app_id, api_key);
 
         // listener
         KairosListener listener = new KairosListener() {
-
-            int successCounter = 0;
 
             @Override
             public void onSuccess(String response) {
                 Log.d("KAIROS DEMO", response);
                 try {
-                    JSONObject jsonResponse = new JSONObject(response);
                     if (successCounter == 2) {
                         if (IMAGES != null) {
-                            JSONArray images2 = jsonResponse.getJSONArray(IMAGES);
-                            JSONObject image = images2.getJSONObject(0);
-                            JSONObject subimage = image.getJSONObject(TRANSACTION);
-                            confidence = subimage.getDouble(CONFIDENCE);
-                            Log.d("Percent: ", confidence.toString());
+                            jsonResponse = new JSONObject(response);
                             successCounter = 0;
                         }
                     }
@@ -123,7 +107,32 @@ public class KairosManager extends AsyncTask<ArrayList<Bitmap>, Void, Void> {
             e.printStackTrace();
         }
 
-        return confidence;
+        return jsonResponse;
     }
+
+    // Parse JSONObject response and return 'confidence' value to MainActivity
+    @Override
+    protected void onPostExecute(JSONObject result){
+        // Return 'confidence' or error to MainActivity
+        try{
+            JSONArray TwoImages = result.getJSONArray(IMAGES);
+            JSONObject image = TwoImages.getJSONObject(0);
+            JSONObject subimage = image.getJSONObject(TRANSACTION);
+            Double confidence = subimage.getDouble(CONFIDENCE);
+            Log.d("Percent: ", confidence.toString());
+            similarity_percent.setText(confidence.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+//    // Call Kairos API and return JSONObject response to doInBackground()
+//  public JSONObject compareImages(Bitmap bm1, Bitmap bm2){
+//        // Kairos Call here!
+//
+//        /* * * instantiate a new kairos instance * * */
+//
+//    }
+
 }
 

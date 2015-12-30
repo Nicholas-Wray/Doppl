@@ -369,13 +369,14 @@ public class MainActivity extends Activity {
             return;
         }
 
-        ArrayList<Bitmap> photos = new ArrayList<Bitmap>();
-        photos.add(((BitmapDrawable) image1.getDrawable()).getBitmap());
-        photos.add(((BitmapDrawable) image2.getDrawable()).getBitmap());
 
         KairosManager myKairosManager = new KairosManager(this);
-        myKairosManager.execute(photos);
+        myKairosManager.execute(((BitmapDrawable) image1.getDrawable()).getBitmap(), ((BitmapDrawable) image2.getDrawable()).getBitmap());
         please_wait.setVisibility(View.VISIBLE);
+    }
+
+    public void setSimilarityPercent(String confidence){
+        similarity_percent.setText(confidence);
     }
 
     public static double round(double value, int places) {
